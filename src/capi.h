@@ -1,0 +1,77 @@
+#pragma once
+
+/** @file
+ *
+ *  C-style API (for Python)
+ *
+ *  In general, any object in C-style API is identified by one or more IDs or indices.
+ *  All IDs are sequential and starts from 0.
+ *  ID of dex files are returned by their loading function.
+ *  ID of classes are local to dex file.
+ *  Methods has two representation form:
+ *      the "declaration" of method is binded to dex file;
+ *      the "definition" of method is binded to class.
+ *  Definition of a method does not contain its name and signature, but offers its declaration ID.
+ *
+ *  Strings and arrays returned by C-style APIs are stored in internal buffers.
+ *  As a result the caller should not modify or free them,
+ *  and the data is available until next invoke.
+ **/
+
+#include <cstdint>
+
+struct IntArray {
+    int32_t len;
+    int32_t data[];
+};
+
+extern "C" {
+
+const char * hello();
+
+/**
+ *  Load definition of instructions.
+ *  This function must be called before any disassembly job.
+ **/
+void load_inst_conf(const char * path);
+
+/**
+ *  Load a dex file; return its ID.
+ **/
+int32_t load_dex(const char * dex_file_name);
+
+/**
+ *  Get number of classes defined in a dex file.
+ *  Their IDs are 0, 1, 2, ... , (return_value - 1).
+ **/
+int32_t get_class_count(int32_t dex_id);
+
+/**
+ *  Get the name of a class. (e.g. `Ljava/lang/String;`)
+ **/
+const char * get_class_name(int32_t dex_id, int32_t class_id);
+
+/**
+ *  Get number of methods defined in a class, containing direct and virtual functions.
+ *  Their indices are 0, 1, 2, ... , (return_value - 1).
+ **/
+int32_t get_methods_count(int32_t dex_id, int32_t class_id);
+
+/**
+ *  Get the name of a method from its dex-wise ID. (e.g. `Ljava/lang/String;-><init>`)
+ **/
+const char * get_method_full_name(int32_t dex_id, int32_t method_id);
+
+/**
+ *  Get the name of a method from its class-wise index. (e.g. `Ljava/lang/String;-><init>`)
+ **/
+const char * get_class_method_full_name(int32_t dex_id, int32_t class_id, int32_t method_idx);
+
+/**
+ *  Get all invoked methods in a method; return an array of their dex-wise ID.
+ *  The result may contain duplicate methods if they occured multiple times in the byte code.
+ *  The order of return value is guaranteed to match the byte code.
+ **/
+const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t method_idx);
+
+}
