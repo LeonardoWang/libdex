@@ -81,3 +81,23 @@ const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t m
     std::copy(ret.cbegin(), ret.cend(), buffer->data);
     return buffer;
 }
+
+
+const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, int32_t method_idx)
+{
+    static IntArray * buffer = nullptr;
+
+    const auto & method = dex_list[dex_id]->classes[class_id].methods(method_idx);
+    auto insts = Inst::load_method(method);
+
+    vector<int> ret;
+    for (const auto & inst : insts)
+        if (inst.is_libradar_invoke())
+            ret.push_back(inst.invoke_target());
+
+    delete [] (int32_t *) buffer;
+    buffer = (IntArray *) new int32_t [ ret.size() + 1 ];
+    buffer->len = ret.size();
+    std::copy(ret.cbegin(), ret.cend(), buffer->data);
+    return buffer;
+}

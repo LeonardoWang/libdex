@@ -36,6 +36,9 @@ libdex.get_class_method_full_name.restype = c_char_p
 libdex.get_invoked_methods.argstypes = [ c_int32, c_int32, c_int32 ]
 libdex.get_invoked_methods.restype = POINTER(c_int32)
 
+libdex.get_invoked_methods_libradar.argstypes = [ c_int32, c_int32, c_int32 ]
+libdex.get_invoked_methods_libradar.restype = POINTER(c_int32)
+
 def decode_int_array(ptr):
     ret = [ ]
     for i in range(ptr[0]):
@@ -101,6 +104,17 @@ class DexMethod:
             b = libdex.get_method_full_name(self.dex.id, method_id)
             ret.append(b.decode('utf8'))
         
+        return ret
+
+    def get_invoked_methods_libradar(self):
+        ptr = libdex.get_invoked_methods_libradar(self.dex.id, self.class_.id, self.idx)
+        method_ids = decode_int_array(ptr)
+
+        ret = [ ]
+        for method_id in method_ids:
+            b = libdex.get_method_full_name(self.dex.id, method_id)
+            ret.append(b.decode('utf8'))
+
         return ret
 
 

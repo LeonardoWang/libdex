@@ -89,6 +89,11 @@ bool Inst::is_invoke() const
     return false;
 }
 
+bool Inst::is_libradar_invoke() const
+{
+    return (InvokeVirtual <= op && op <= InvokeInterface);
+}
+
 vector<Inst> Inst::load_method(const EncodedMethod & method)
 {
     vector<Inst> ret;

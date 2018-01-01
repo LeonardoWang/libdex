@@ -74,4 +74,10 @@ const char * get_class_method_full_name(int32_t dex_id, int32_t class_id, int32_
  **/
 const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t method_idx);
 
+
+/**
+ *  Similar to `get_invoked_methods`, but ignore ranged and polymorphic invocations.
+ **/
+const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, int32_t method_idx);
+
 }

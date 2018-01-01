@@ -29,4 +29,8 @@ struct Inst {
 
     /** Load a method; return a vector of its instructions **/
     static std::vector<Inst> load_method(const EncodedMethod & method);
+
+
+    /** LibRadar cannot detect ranged and polymorphic invocations **/
+    bool is_libradar_invoke() const;
 };
