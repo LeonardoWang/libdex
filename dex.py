@@ -45,6 +45,7 @@ def decode_int_array(ptr):
 inst_file = lx.file_path(__file__, 'instruments.txt')
 libdex.load_inst_conf(inst_file.encode('utf8'))
 
+
 class Dex:
     def __init__(self, dex_file_name):
         if type(dex_file_name) is str:
@@ -56,6 +57,7 @@ class Dex:
 
         class_cnt = libdex.get_class_count(self.id)
         self.classes = [ DexClass(self, i) for i in range(class_cnt) ]
+
 
 class DexClass:
     def __init__(self, dex, id_):
@@ -75,6 +77,7 @@ class DexClass:
             method_cnt = libdex.get_methods_count(self.dex.id, self.id)
             self._methods = [ DexMethod(self, i) for i in range(method_cnt) ]
         return self._methods
+
 
 class DexMethod:
     def __init__(self, class_, idx):
@@ -100,8 +103,10 @@ class DexMethod:
         
         return ret
 
-def test():
-    dex = Dex('classes.dex')
+
+
+def test(file_name):
+    dex = Dex(file_name)
     for class_ in dex.classes:
         print(class_.name())
         for method in class_.methods():
@@ -109,5 +114,10 @@ def test():
             for im in method.get_invoked_methods():
                 print('        ' + im)
 
+import sys
+
 if __name__ == '__main__':
-    test()
+    if len(sys.argv) == 1:
+        test('classes.dex')
+    else:
+        test(sys.argv[1])

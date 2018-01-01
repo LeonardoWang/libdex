@@ -3,14 +3,20 @@
 
 #include <cstdio>
 
-int main(int , char * argv[])
+int main(int argc, char * argv[])
 {
     String path = argv[0];
     int p = path.rfind('/');
     path = path.slice(0, p + 1) + "instruments.txt";
-
     load_inst_conf(path.cstr());
-    int dex_id = load_dex("classes.dex");
+
+    const char * dex_file;
+    if (argc == 1)
+        dex_file = "classes.dex";
+    else
+        dex_file = argv[1];
+
+    int dex_id = load_dex(dex_file);
 
     int class_cnt = get_class_count(dex_id);
     for (int class_id = 0; class_id < class_cnt; ++class_id) {
