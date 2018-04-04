@@ -5,11 +5,6 @@
 
 int main(int argc, char * argv[])
 {
-    String path = argv[0];
-    int p = path.rfind('/');
-    path = path.slice(0, p + 1) + "instruments.txt";
-    load_inst_conf(path.cstr());
-
     const char * dex_file;
     if (argc == 1)
         dex_file = "classes.dex";

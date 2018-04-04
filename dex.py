@@ -1,16 +1,13 @@
 from ctypes import *
 from os import path
 
-so_path = path.join(path.dirname(__file__), 'libdex.so')
+so_path = path.join(path.abspath(path.dirname(__file__)), 'libdex.so')
 libdex = cdll.LoadLibrary(so_path)
 
 # These functions are defined in `capi.h/cpp`
 
 libdex.hello.argtypes = [ ]
 libdex.hello.restype = c_char_p
-
-libdex.load_inst_conf.argstypes = [ c_char_p ]
-libdex.load_inst_conf.restype = None
 
 libdex.load_dex.argstypes = [ c_char_p ]
 libdex.load_dex.restype = c_int32
@@ -41,9 +38,6 @@ def decode_int_array(ptr):
     for i in range(ptr[0]):
         ret.append(ptr[i + 1])
     return ret
-
-inst_file = lx.file_path(__file__, 'instruments.txt')
-libdex.load_inst_conf(inst_file.encode('utf8'))
 
 
 class Dex:
