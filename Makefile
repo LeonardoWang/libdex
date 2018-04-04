@@ -1,4 +1,4 @@
-SRC = capi.cpp dex.cpp inst.cpp instformat.cpp reader.cpp ustring.cpp ustring_encoding.cpp
+SRC = capi.cpp dex.cpp inst.cpp insttype.cpp reader.cpp ustring.cpp ustring_encoding.cpp
 
 CXX = g++ -std=c++17 -Wall -Wextra
 
@@ -26,3 +26,4 @@ build/%.o : src/%.cpp
 .PHONY : clean
 clean :
 	-rm -r build
+	-rm test

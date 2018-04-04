@@ -5,6 +5,7 @@
  **/
 
 #include "reader.h"
+#include "inst.h"
 
 /** Signature of method **/
 struct Proto {
@@ -59,6 +60,9 @@ struct EncodedMethod {
 
     void load_detail(Reader r);
     void clear();
+
+    InstIter begin() const { return InstIter(insts); }
+    InstIter end() const { return InstIter(insts + inst_size * 2); }
 };
 
 /** Definition of class **/

@@ -2,17 +2,11 @@
 
 #include "dex.h"
 #include "inst.h"
-#include "instformat.h"
 
 const char * hello() { return "hello, world\n"; }
 
 namespace {
 vector<Dex*> dex_list;
-}
-
-void load_inst_conf(const char * path)
-{
-    InstFormat::load(path);
 }
 
 int32_t load_dex(const char * dex_file_name)
@@ -68,10 +62,9 @@ const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t m
     static IntArray * buffer = nullptr;
 
     const auto & method = dex_list[dex_id]->classes[class_id].methods(method_idx);
-    auto insts = Inst::load_method(method);
 
     vector<int> ret;
-    for (const auto & inst : insts)
+    for (const auto & inst : method)
         if (inst.is_invoke())
             ret.push_back(inst.invoke_target());
 
@@ -88,10 +81,9 @@ const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, 
     static IntArray * buffer = nullptr;
 
     const auto & method = dex_list[dex_id]->classes[class_id].methods(method_idx);
-    auto insts = Inst::load_method(method);
 
     vector<int> ret;
-    for (const auto & inst : insts)
+    for (const auto & inst : method)
         if (inst.is_libradar_invoke())
             ret.push_back(inst.invoke_target());
 

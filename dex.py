@@ -3,7 +3,7 @@ import lx
 from ctypes import *
 import os.path
 
-so_path = lx.file_path(__file__, 'libdex.so')
+so_path = lx.res_file_path(__file__, 'libdex.so')
 print(so_path)
 libdex = cdll.LoadLibrary(so_path)
 
@@ -11,9 +11,6 @@ libdex = cdll.LoadLibrary(so_path)
 
 libdex.hello.argtypes = [ ]
 libdex.hello.restype = c_char_p
-
-libdex.load_inst_conf.argstypes = [ c_char_p ]
-libdex.load_inst_conf.restype = None
 
 libdex.load_dex.argstypes = [ c_char_p ]
 libdex.load_dex.restype = c_int32
@@ -44,9 +41,6 @@ def decode_int_array(ptr):
     for i in range(ptr[0]):
         ret.append(ptr[i + 1])
     return ret
-
-inst_file = lx.file_path(__file__, 'instruments.txt')
-libdex.load_inst_conf(inst_file.encode('utf8'))
 
 
 class Dex:
