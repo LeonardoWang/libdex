@@ -96,12 +96,15 @@ String::Content * String::from_mutf8(const uint8_t * str, int len)
     int l = 0;
     while (i < len) {
         Char ch = get_utf8_code_point(str, & i);
+        int i0 = i;
 
         if (is_utf16_surrogate_high(ch)) {
             Char low = get_utf8_code_point(str, & i);
-            if (! is_utf16_surrogate_low(low))
-                throw EncodingError("not surrogate low byte");
-            ch = get_utf16_surrogate_val(ch, low);
+            if (! is_utf16_surrogate_low(low)) {
+                i = i0;
+            } else {
+                ch = get_utf16_surrogate_val(ch, low);
+            }
         }
 
         buf[l++] = ch;

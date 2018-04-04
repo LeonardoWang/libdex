@@ -32,7 +32,6 @@ void Dex::init()
 
     if (hdr->header_size != dex_header_size) throw FormatError("Incorrect header size");
     if (hdr->endian_tag != endian_constant) throw FormatError("Incorrect endian");
-    if (hdr->data_size % sizeof(uint32_t) != 0) throw FormatError("Incorrect data size");
     if (! r.is_valid()) throw FormatError("Incomplete header");
     // TODO: check magic and checksum
 

@@ -1,10 +1,7 @@
-import lx
-
 from ctypes import *
-import os.path
+from os import path
 
-so_path = lx.res_file_path(__file__, 'libdex.so')
-print(so_path)
+so_path = path.join(path.abspath(path.dirname(__file__)), 'libdex.so')
 libdex = cdll.LoadLibrary(so_path)
 
 # These functions are defined in `capi.h/cpp`
