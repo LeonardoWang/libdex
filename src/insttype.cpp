@@ -18,13 +18,18 @@ enum Format {
     opAABBBBCCCCHHHH,
     opAGBBBBDCFEHHHH,
     opAABBBBBBBBBBBBBBBB,
+    _10t,
+    _20t,
+    _21t,
+    _22t,
+    _30t,
 };
 
 uint64_t _b(const uint8_t * d, int n) { return (uint64_t) d[n] << (n * 8); }
 uint64_t read_l(const uint8_t * d) { return d[0] & 0x0f; }
 uint64_t read_h(const uint8_t * d) { return d[0] >> 4; }
-uint64_t read_2(const uint8_t * d) { return d[0] + _b(d, 1); }
-uint64_t read_4(const uint8_t * d) { return d[0] + _b(d, 1) + _b(d, 2) + _b(d, 3); }
+uint16_t read_2(const uint8_t * d) { return d[0] + _b(d, 1); }
+uint32_t read_4(const uint8_t * d) { return d[0] + _b(d, 1) + _b(d, 2) + _b(d, 3); }
 uint64_t read_8(const uint8_t * d) { return d[0] + _b(d, 1) + _b(d, 2) + _b(d, 3) + _b(d, 4) + _b(d, 5) + _b(d, 6) + _b(d, 7); }
 
 struct Getter_op00 : public InstType::Getter {
@@ -33,6 +38,11 @@ struct Getter_op00 : public InstType::Getter {
 
 struct Getter_opAA : public InstType::Getter {
     virtual uint64_t a(const uint8_t * data) const override { return data[1]; }
+    virtual int length() const override { return 2; }
+};
+
+struct Getter_10t : public InstType::Getter {
+    virtual uint64_t a(const uint8_t * data) const override { return (int8_t) data[1]; }
     virtual int length() const override { return 2; }
 };
 
@@ -47,9 +57,20 @@ struct Getter_op00AAAA : public InstType::Getter {
     virtual int length() const override { return 4; }
 };
 
+struct Getter_20t : public InstType::Getter {
+    virtual uint64_t a(const uint8_t * data) const override { return (int16_t) read_2(data + 2); }
+    virtual int length() const override { return 4; }
+};
+
 struct Getter_opAABBBB : public InstType::Getter {
     virtual uint64_t a(const uint8_t * data) const override { return data[1]; }
     virtual uint64_t b(const uint8_t * data) const override { return read_2(data + 2); }
+    virtual int length() const override { return 4; }
+};
+
+struct Getter_21t : public InstType::Getter {
+    virtual uint64_t a(const uint8_t * data) const override { return data[1]; }
+    virtual uint64_t b(const uint8_t * data) const override { return (int16_t) read_2(data + 2); }
     virtual int length() const override { return 4; }
 };
 
@@ -67,8 +88,20 @@ struct Getter_opBACCCC : public InstType::Getter {
     virtual int length() const override { return 4; }
 };
 
+struct Getter_22t : public InstType::Getter {
+    virtual uint64_t a(const uint8_t * data) const override { return read_l(data + 1); }
+    virtual uint64_t b(const uint8_t * data) const override { return read_h(data + 1); }
+    virtual uint64_t c(const uint8_t * data) const override { return (int16_t) read_2(data + 2); }
+    virtual int length() const override { return 4; }
+};
+
 struct Getter_op00AAAAAAAA : public InstType::Getter {
     virtual uint64_t a(const uint8_t * data) const override { return read_4(data + 2); }
+    virtual int length() const override { return 6; }
+};
+
+struct Getter_30t : public InstType::Getter {
+    virtual uint64_t a(const uint8_t * data) const override { return (int32_t) read_4(data + 2); }
     virtual int length() const override { return 6; }
 };
 
@@ -131,21 +164,26 @@ struct Getter_opAABBBBBBBBBBBBBBBB : public InstType::Getter {
 }
 
 const InstType::Getter * InstType::getters[] = {
-    [op00]                   = new Getter_op00(),
-    [opAA]                   = new Getter_opAA(),
-    [opBA]                   = new Getter_opBA(),
-    [op00AAAA]               = new Getter_op00AAAA(),
-    [opAABBBB]               = new Getter_opAABBBB(),
-    [opAACCBB]               = new Getter_opAACCBB(),
-    [opBACCCC]               = new Getter_opBACCCC(),
-    [op00AAAAAAAA]           = new Getter_op00AAAAAAAA(),
-    [op00AAAABBBB]           = new Getter_op00AAAABBBB(),
-    [opAABBBBBBBB]           = new Getter_opAABBBBBBBB(),
-    [opAABBBBCCCC]           = new Getter_opAABBBBCCCC(),
-    [opAGBBBBDCFE]           = new Getter_opAGBBBBDCFE(),
-    [opAABBBBCCCCHHHH]       = new Getter_opAABBBBCCCCHHHH(),
-    [opAGBBBBDCFEHHHH]       = new Getter_opAGBBBBDCFEHHHH(),
-    [opAABBBBBBBBBBBBBBBB]   = new Getter_opAABBBBBBBBBBBBBBBB(),
+    [op00]                  = new Getter_op00(),
+    [opAA]                  = new Getter_opAA(),
+    [opBA]                  = new Getter_opBA(),
+    [op00AAAA]              = new Getter_op00AAAA(),
+    [opAABBBB]              = new Getter_opAABBBB(),
+    [opAACCBB]              = new Getter_opAACCBB(),
+    [opBACCCC]              = new Getter_opBACCCC(),
+    [op00AAAAAAAA]          = new Getter_op00AAAAAAAA(),
+    [op00AAAABBBB]          = new Getter_op00AAAABBBB(),
+    [opAABBBBBBBB]          = new Getter_opAABBBBBBBB(),
+    [opAABBBBCCCC]          = new Getter_opAABBBBCCCC(),
+    [opAGBBBBDCFE]          = new Getter_opAGBBBBDCFE(),
+    [opAABBBBCCCCHHHH]      = new Getter_opAABBBBCCCCHHHH(),
+    [opAGBBBBDCFEHHHH]      = new Getter_opAGBBBBDCFEHHHH(),
+    [opAABBBBBBBBBBBBBBBB]  = new Getter_opAABBBBBBBBBBBBBBBB(),
+    [_10t]                  = new Getter_10t(),
+    [_20t]                  = new Getter_20t(),
+    [_21t]                  = new Getter_21t(),
+    [_22t]                  = new Getter_22t(),
+    [_30t]                  = new Getter_30t(),
 };
 
 const InstType inst_types[256] = {
@@ -189,9 +227,9 @@ const InstType inst_types[256] = {
     [0x25] = InstType("filled_new_array/range",     opAABBBBCCCC,           "{vC .. vN}, type@B"                    ),
     [0x26] = InstType("fill_array_data",            opAABBBBBBBB,           "{vA, +B}"                              ),
     [0x27] = InstType("throw",                      opAA,                   "vA"                                    ),
-    [0x28] = InstType("goto",                       opAA,                   "+A"                                    ),
-    [0x29] = InstType("goto/16",                    op00AAAA,               "+A"                                    ),
-    [0x2a] = InstType("goto/32",                    op00AAAAAAAA,           "+A"                                    ),
+    [0x28] = InstType("goto",                       _10t,                   "+A"                                    ),
+    [0x29] = InstType("goto/16",                    _20t,                   "+A"                                    ),
+    [0x2a] = InstType("goto/32",                    _30t,                   "+A"                                    ),
     [0x2b] = InstType("packed_switch",              opAABBBBBBBB,           "vA, +B"                                ),
     [0x2c] = InstType("sparse_switch",              opAABBBBBBBB,           "vA, +B"                                ),
     [0x2d] = InstType("cmpl_float",                 opAACCBB,               "vA, vB, vC"                            ),
@@ -199,18 +237,18 @@ const InstType inst_types[256] = {
     [0x2f] = InstType("cmpl_double",                opAACCBB,               "vA, vB, vC"                            ),
     [0x30] = InstType("cmpg_double",                opAACCBB,               "vA, vB, vC"                            ),
     [0x31] = InstType("cmp_long",                   opAACCBB,               "vA, vB, vC"                            ),
-    [0x32] = InstType("if_eq",                      opBACCCC,               "vA, vB, +C"                            ),
-    [0x33] = InstType("if_ne",                      opBACCCC,               "vA, vB, +C"                            ),
-    [0x34] = InstType("if_lt",                      opBACCCC,               "vA, vB, +C"                            ),
-    [0x35] = InstType("if_ge",                      opBACCCC,               "vA, vB, +C"                            ),
-    [0x36] = InstType("if_gt",                      opBACCCC,               "vA, vB, +C"                            ),
-    [0x37] = InstType("if_le",                      opBACCCC,               "vA, vB, +C"                            ),
-    [0x38] = InstType("if_eqz",                     opAABBBB,               "vA, +B"                                ),
-    [0x39] = InstType("if_nez",                     opAABBBB,               "vA, +B"                                ),
-    [0x3a] = InstType("if_ltz",                     opAABBBB,               "vA, +B"                                ),
-    [0x3b] = InstType("if_gez",                     opAABBBB,               "vA, +B"                                ),
-    [0x3c] = InstType("if_gtz",                     opAABBBB,               "vA, +B"                                ),
-    [0x3d] = InstType("if_lez",                     opAABBBB,               "vA, +B"                                ),
+    [0x32] = InstType("if_eq",                      _22t,                   "vA, vB, +C"                            ),
+    [0x33] = InstType("if_ne",                      _22t,                   "vA, vB, +C"                            ),
+    [0x34] = InstType("if_lt",                      _22t,                   "vA, vB, +C"                            ),
+    [0x35] = InstType("if_ge",                      _22t,                   "vA, vB, +C"                            ),
+    [0x36] = InstType("if_gt",                      _22t,                   "vA, vB, +C"                            ),
+    [0x37] = InstType("if_le",                      _22t,                   "vA, vB, +C"                            ),
+    [0x38] = InstType("if_eqz",                     _21t,                   "vA, +B"                                ),
+    [0x39] = InstType("if_nez",                     _21t,                   "vA, +B"                                ),
+    [0x3a] = InstType("if_ltz",                     _21t,                   "vA, +B"                                ),
+    [0x3b] = InstType("if_gez",                     _21t,                   "vA, +B"                                ),
+    [0x3c] = InstType("if_gtz",                     _21t,                   "vA, +B"                                ),
+    [0x3d] = InstType("if_lez",                     _21t,                   "vA, +B"                                ),
     [0x3e] = InstType("UNUSED",                     op00                                                            ),
     [0x3f] = InstType("UNUSED",                     op00                                                            ),
     [0x40] = InstType("UNUSED",                     op00                                                            ),
@@ -357,25 +395,25 @@ const InstType inst_types[256] = {
     [0xcd] = InstType("mul_double/2addr",           opBA,                   "vA, vB"                                ),
     [0xce] = InstType("div_double/2addr",           opBA,                   "vA, vB"                                ),
     [0xcf] = InstType("rem_double/2addr",           opBA,                   "vA, vB"                                ),
-    [0xd0] = InstType("add_int/lit16",              opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd1] = InstType("rsub_int",                   opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd2] = InstType("mul_int/lit16",              opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd3] = InstType("div_int/lit16",              opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd4] = InstType("rem_int/lit16",              opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd5] = InstType("and_int/lit16",              opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd6] = InstType("or_int/lit16",               opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd7] = InstType("xor_int/lit16",              opBACCCC,               "vA, vB, #+CCCC"                        ),
-    [0xd8] = InstType("add_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xd9] = InstType("rsub_int/lit8",              opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xda] = InstType("mul_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xdb] = InstType("div_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xdc] = InstType("rem_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xdd] = InstType("and_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xde] = InstType("or_int/lit8",                opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xdf] = InstType("xor_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xe0] = InstType("shl_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xe1] = InstType("shr_int/lit8",               opAACCBB,               "vA, vB, #+CCCC"                        ),
-    [0xe2] = InstType("ushr_int/lit8",              opAACCBB,               "vA, vB, #+CCCC"                        ),
+    [0xd0] = InstType("add_int/lit16",              opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd1] = InstType("rsub_int",                   opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd2] = InstType("mul_int/lit16",              opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd3] = InstType("div_int/lit16",              opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd4] = InstType("rem_int/lit16",              opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd5] = InstType("and_int/lit16",              opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd6] = InstType("or_int/lit16",               opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd7] = InstType("xor_int/lit16",              opBACCCC,               "vA, vB, #+C"                           ),
+    [0xd8] = InstType("add_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xd9] = InstType("rsub_int/lit8",              opAACCBB,               "vA, vB, #+C"                           ),
+    [0xda] = InstType("mul_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xdb] = InstType("div_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xdc] = InstType("rem_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xdd] = InstType("and_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xde] = InstType("or_int/lit8",                opAACCBB,               "vA, vB, #+C"                           ),
+    [0xdf] = InstType("xor_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xe0] = InstType("shl_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xe1] = InstType("shr_int/lit8",               opAACCBB,               "vA, vB, #+C"                           ),
+    [0xe2] = InstType("ushr_int/lit8",              opAACCBB,               "vA, vB, #+C"                           ),
     [0xe3] = InstType("UNUSED",                     op00                                                            ),
     [0xe4] = InstType("UNUSED",                     op00                                                            ),
     [0xe5] = InstType("UNUSED",                     op00                                                            ),
@@ -403,6 +441,6 @@ const InstType inst_types[256] = {
     [0xfb] = InstType("invoke_polymorphic/range",   opAABBBBCCCCHHHH,       "{vC .. vN}, meth@B, proto@H"           ),
     [0xfc] = InstType("invoke_custom",              opAGBBBBDCFE,           "{vC, vD, vE, vF, vG}, call_site@B"     ),
     [0xfd] = InstType("invoke_custom/range",        opAABBBBCCCC,           "{vC .. vN}, call_site@B"               ),
-    [0xfe] = InstType("UNUSED",                     op00                                                            ),
-    [0xff] = InstType("UNUSED",                     op00                                                            ),
+    [0xfe] = InstType("const_method_handle",        opAABBBB,               "vA, method_handle@B"                   ),
+    [0xff] = InstType("const_method_type",          opAABBBB,               "vA, proto@B"                           ),
 };

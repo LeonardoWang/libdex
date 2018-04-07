@@ -1,6 +1,8 @@
 #include "dex.h"
 #include "dexheader.h"
 
+#include <cstdio>
+
 const uint32_t no_index = 0xffffffff;
 
 void EncodedMethod::load_detail(Reader r)

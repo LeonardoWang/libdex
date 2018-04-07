@@ -60,6 +60,7 @@ struct EncodedMethod {
 
     void load_detail(Reader r);
     void clear();
+    bool valid() const { return method_id >= 0; }
 
     InstIter begin() const { return InstIter(insts); }
     InstIter end() const { return InstIter(insts + inst_size * 2); }
@@ -86,7 +87,12 @@ struct Class {
     {
         if (idx < (int) direct_methods.size())
             return direct_methods[idx];
-        else
+        else if (idx < (int) (direct_methods.size() + virtual_methods.size()))
             return virtual_methods[idx - direct_methods.size()];
+        else {
+            EncodedMethod fail;
+            fail.method_id = -1;
+            return fail;
+        }
     }
 };

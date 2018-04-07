@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <vector>
 
+using std::vector;
+
 class EncodedMethod;
 
 /** 
@@ -29,19 +31,31 @@ struct Inst {
     /** Load one instruction from given address **/
     Inst(const uint8_t * bytes) : bytes(bytes) { }
 
+    Inst next() const { return Inst(bytes + length()); }
+
     /** Check if this instruction is loading a const number **/
     bool is_const() const;
     /** Check if this instruction is loading a const string **/
     bool is_const_string() const;
     /** Check if this instruction is invoking a function **/
     bool is_invoke() const;
+    bool is_return() const;
+    bool is_throw() const;
+    bool is_goto() const;
+    bool is_branch() const;
+    bool is_switch() const;
 
     /** Return the index of invoked method for a invoking instruction **/
     int invoke_target() const { return get_b(); }
-
+    Inst goto_target() const { return Inst(bytes + (int64_t) get_a() * 2); }
+    Inst branch_target() const;
+    vector<Inst> switch_targets() const;
 
     /** LibRadar cannot detect ranged and polymorphic invocations **/
     bool is_libradar_invoke() const;
+
+    bool operator!= (Inst i) const { return bytes != i.bytes; }
+    bool operator< (Inst i) const { return bytes < i.bytes; }
 };
 
 struct InstIter {

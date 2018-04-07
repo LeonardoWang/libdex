@@ -1,6 +1,14 @@
-SRC = capi.cpp dex.cpp inst.cpp insttype.cpp reader.cpp ustring.cpp ustring_encoding.cpp
+SRC = capi.cpp			\
+      analyze.cpp 		\
+      dex.cpp 			\
+      inst.cpp 			\
+      insttype.cpp		\
+      reader.cpp 		\
+      ustring.cpp 		\
+      ustring_encoding.cpp	\
+      repackage.cpp
 
-CXX = g++ -std=c++17 -Wall -Wextra
+CXX = g++ -std=c++17 -Wall -Wextra -fmax-errors=1 -O2
 
 OBJ = $(SRC:%.cpp=build/%.o)
 DEP = $(OBJ:%.o=%.d)
@@ -10,8 +18,11 @@ all : libdex.so test
 libdex.so : $(OBJ)
 	$(CXX) $^ -shared -o $@
 
-test : $(OBJ) libdex.so src/main.cpp
-	$(CXX) src/main.cpp -L. -ldex -o $@
+#test : $(OBJ) libdex.so src/main.cpp
+#	$(CXX) src/main.cpp -L. -ldex -o $@
+
+test : $(OBJ) src/main.cpp
+	$(CXX) $^ -o test
 
 .PHONY : run-test
 run-test : test
