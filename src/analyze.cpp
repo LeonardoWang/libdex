@@ -8,8 +8,10 @@ using std::set;
 
 vector<BasicBlock> split_basic_blocks(const EncodedMethod & method)
 {
+    auto i_begin = * method.begin();
+    auto i_end = * method.end();
+
     set<Inst> split_points;
-    split_points.insert(* method.begin());
 
     for (auto inst : method) {
         if (inst.is_return()) {
@@ -34,9 +36,9 @@ vector<BasicBlock> split_basic_blocks(const EncodedMethod & method)
     }
 
     vector<BasicBlock> ret;
-    Inst prev = * split_points.begin();
+    Inst prev = i_begin;
     for (auto inst : split_points) {
-        if (inst != prev) {
+        if (inst != prev && i_begin <= inst && inst <= i_end) {
             ret.emplace_back(prev, inst);
             prev = inst;
         }

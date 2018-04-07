@@ -55,7 +55,8 @@ struct Inst {
     bool is_libradar_invoke() const;
 
     bool operator!= (Inst i) const { return bytes != i.bytes; }
-    bool operator< (Inst i) const { return bytes < i.bytes; }
+    bool operator<  (Inst i) const { return bytes <  i.bytes; }
+    bool operator<= (Inst i) const { return bytes <= i.bytes; }
 };
 
 struct InstIter {
