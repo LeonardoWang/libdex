@@ -74,7 +74,7 @@ const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t m
 
     vector<int> ret;
     for (const auto & inst : method)
-        if (inst.is_invoke())
+        if (inst.is_invoke() && inst.invoke_target() < dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
     delete [] (int32_t *) buffer;
@@ -94,7 +94,7 @@ const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, 
 
     vector<int> ret;
     for (const auto & inst : method)
-        if (inst.is_libradar_invoke())
+        if (inst.is_libradar_invoke() && inst.invoke_target() < dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
     delete [] (int32_t *) buffer;
