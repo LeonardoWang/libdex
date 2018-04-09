@@ -64,6 +64,20 @@ DexFeature dex_features(const Dex * dex, bool ordered)
     return ret;
 }
 
+vector<int> encode(const ClassFeature & cf)
+{
+    vector<int> ret;
+    ret.push_back(-1);
+    for (const auto & mf : cf) {
+        ret.push_back(-2);
+        for (const auto & bf : mf) {
+            ret.push_back(-3);
+            ret.insert(ret.end(), bf.cbegin(), bf.cend());
+        }
+    }
+    return ret;
+}
+
 vector<int> encode(const DexFeature & df)
 {
     vector<int> ret;
@@ -80,6 +94,12 @@ vector<int> encode(const DexFeature & df)
     return ret;
 }
 
+}
+
+vector<int> class_repackage_features(const Class & class_, bool ordered)
+{
+    auto features = class_features(class_, ordered);
+    return encode(features);
 }
 
 vector<int> repackage_features(const Dex * dex, bool ordered)

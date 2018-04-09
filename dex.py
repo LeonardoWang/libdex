@@ -36,6 +36,9 @@ libdex.get_invoked_methods_libradar.restype = POINTER(c_int32)
 libdex.get_repackage_features.argstypes = [ c_int32, c_int32 ]
 libdex.get_repackage_features.restype = POINTER(c_int32)
 
+libdex.get_class_repackage_features.argstypes = [ c_int32, c_int32, c_int32 ]
+libdex.get_class_repackage_features.restype = POINTER(c_int32)
+
 def decode_int_array(ptr):
     ret = [ ]
     for i in range(ptr[0]):
@@ -95,6 +98,13 @@ class DexClass:
             self._methods = [ DexMethod(self, i) for i in range(method_cnt) ]
         return self._methods
 
+    def get_repackage_features(self, ordered = False):
+        ptr = libdex.get_class_repackage_features(self.dex.id, self.id, 1 if ordered else 0)
+        arr = decode_int_array(ptr)
+        ret = decode_features(arr, 0)
+        assert len(ret) == 1
+        return ret[0]
+
 
 class DexMethod:
     def __init__(self, class_, idx):
@@ -135,13 +145,14 @@ class DexMethod:
 
 def test(file_name):
     dex = Dex(file_name)
-    #for class_ in dex.classes:
-    #    print(class_.name())
-    #    for method in class_.methods():
-    #        print('    ' + method.name())
-    #        for im in method.get_invoked_methods():
-    #            print('        ' + im)
-    print(dex.get_repackage_features())
+    for class_ in dex.classes:
+        print(class_.name())
+        #for method in class_.methods():
+        #    print('    ' + method.name())
+        #    for im in method.get_invoked_methods():
+        #        print('        ' + im)
+        f = class_.get_repackage_features()
+        print(f)
 
 import sys
 

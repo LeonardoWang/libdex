@@ -9,6 +9,15 @@ const char * hello() { return "hello, world\n"; }
 
 namespace {
 vector<Dex*> dex_list;
+
+IntArray * update_buffer(IntArray * & buffer, const vector<int> & vec)
+{
+    delete [] (int32_t *) buffer;
+    buffer = (IntArray *) new int32_t [ vec.size() + 1 ];
+    buffer->len = vec.size();
+    std::copy(vec.cbegin(), vec.cend(), buffer->data);
+    return buffer;
+}
 }
 
 int32_t load_dex(const char * dex_file_name)
@@ -77,11 +86,7 @@ const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t m
         if (inst.is_invoke() && inst.invoke_target() < (int) dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
-    delete [] (int32_t *) buffer;
-    buffer = (IntArray *) new int32_t [ ret.size() + 1 ];
-    buffer->len = ret.size();
-    std::copy(ret.cbegin(), ret.cend(), buffer->data);
-    return buffer;
+    return update_buffer(buffer, ret);
 }
 
 
@@ -97,11 +102,7 @@ const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, 
         if (inst.is_libradar_invoke() && inst.invoke_target() < (int) dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
-    delete [] (int32_t *) buffer;
-    buffer = (IntArray *) new int32_t [ ret.size() + 1 ];
-    buffer->len = ret.size();
-    std::copy(ret.cbegin(), ret.cend(), buffer->data);
-    return buffer;
+    return update_buffer(buffer, ret);
 }
 
 vector<int> repackage_features(const Dex * dex, bool ordered);
@@ -111,9 +112,16 @@ const IntArray * get_repackage_features(int32_t dex_id, int32_t ordered)
     static IntArray * buffer = nullptr;
 
     auto ret = repackage_features(dex_list[dex_id], ordered != 0);
-    delete [] (int32_t *) buffer;
-    buffer = (IntArray *) new int32_t [ ret.size() + 1 ];
-    buffer->len = ret.size();
-    std::copy(ret.cbegin(), ret.cend(), buffer->data);
-    return buffer;
+    return update_buffer(buffer, ret);
+}
+
+vector<int> class_repackage_features(const Class & class_, bool ordered);
+
+const IntArray * get_class_repackage_features(int32_t dex_id, int32_t class_id, int32_t ordered)
+{
+    static IntArray * buffer = nullptr;
+
+    const auto & c = dex_list[dex_id]->classes[class_id];
+    auto ret = class_repackage_features(c, ordered != 0);
+    return update_buffer(buffer, ret);
 }

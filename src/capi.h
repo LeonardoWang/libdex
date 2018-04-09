@@ -107,4 +107,6 @@ const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, 
  **/
 const IntArray * get_repackage_features(int32_t dex_id, int32_t ordered);
 
+const IntArray * get_class_repackage_features(int32_t dex_id, int32_t class_id, int32_t ordered);
+
 }
