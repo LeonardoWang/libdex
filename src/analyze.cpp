@@ -3,6 +3,7 @@
 #include "dexstruct.h"
 
 #include <set>
+#include <cstdio>
 
 using std::set;
 
@@ -14,6 +15,11 @@ vector<BasicBlock> split_basic_blocks(const EncodedMethod & method)
     set<Inst> split_points;
 
     for (auto inst : method) {
+        if (inst >= i_end) {
+            fputs("instruction exceeds end of method\n", stderr);
+            break;
+        }
+
         if (inst.is_return()) {
             split_points.insert(inst.next());
 
@@ -26,7 +32,7 @@ vector<BasicBlock> split_basic_blocks(const EncodedMethod & method)
 
         } else if (inst.is_switch()) {
             split_points.insert(inst.next());
-            auto targets = inst.switch_targets();
+            auto targets = inst.switch_targets(i_begin, i_end);
             split_points.insert(targets.begin(), targets.end());
 
         } else if (inst.is_branch()) {

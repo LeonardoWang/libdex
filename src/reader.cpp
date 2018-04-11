@@ -109,5 +109,6 @@ Reader Reader::from_fd(int fd)
 
     ret.data = (const uint8_t *) bytes;
     ret.off = 0;
+    ret.size = st.st_size;
     return ret;
 }

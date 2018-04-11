@@ -62,8 +62,8 @@ struct EncodedMethod {
     void clear();
     bool valid() const { return method_id >= 0; }
 
-    InstIter begin() const { return InstIter(insts); }
-    InstIter end() const { return InstIter(insts + inst_size * 2); }
+    InstIter begin() const { return InstIter(insts ? insts : nullptr); }
+    InstIter end() const { return InstIter(insts ? insts + inst_size * 2 : nullptr); }
 };
 
 /** Definition of class **/

@@ -10,10 +10,12 @@ using std::vector;
  **/
 class Reader {
 public:
-    Reader(const uint8_t * data, int32_t off = 0) : data(data), off(off) { }
+    Reader(const uint8_t * data, int32_t off = 0, int size = -1)
+        : data(data), off(off), size(size)
+    { }
 
     /** Create a new reader on same buffer starts from given position **/
-    Reader at(int32_t pos) { return Reader(data, pos); }
+    Reader at(int32_t pos) { return Reader(data, pos, size); }
 
     /** Read a 16-bit unsigned int **/
     uint16_t u16();
@@ -39,6 +41,8 @@ public:
     /** Check whether this reader is in valid state **/
     bool is_valid() { return off >= 0; }
 
+    bool in_range(int64_t pos) { return pos < size - off; }
+
     static int open_file(const char * file_name);
     static void close_file(int fd);
     static Reader from_fd(int fd);
@@ -46,6 +50,7 @@ public:
 private:
     const uint8_t * data;
     int32_t off;
+    int size;
 
     uint32_t read_utf8_2_bytes();
     uint32_t read_utf8_3_bytes();

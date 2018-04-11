@@ -26,7 +26,7 @@ BlockFeature block_features(BasicBlock block, bool ordered)
 
 MethodFeature method_features(const EncodedMethod & method, bool ordered)
 {
-    //printf("  decoding method %s\n", _dex->methods[method.method_id].name.cstr());
+    //printf("  decoding method %s [%04x]\n", _dex->methods[method.method_id].name.cstr(), method.inst_size);
     //for (Inst inst : method) {
     //    for (int i = 0; i < inst.length(); ++i)
     //        printf("%02x ", inst.bytes[i]);

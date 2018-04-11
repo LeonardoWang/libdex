@@ -49,7 +49,7 @@ struct Inst {
     int invoke_target() const { return get_b(); }
     Inst goto_target() const { return Inst(bytes + (int64_t) get_a() * 2); }
     Inst branch_target() const;
-    vector<Inst> switch_targets() const;
+    vector<Inst> switch_targets(Inst l, Inst r) const;
 
     /** LibRadar cannot detect ranged and polymorphic invocations **/
     bool is_libradar_invoke() const;
@@ -57,6 +57,7 @@ struct Inst {
     bool operator!= (Inst i) const { return bytes != i.bytes; }
     bool operator<  (Inst i) const { return bytes <  i.bytes; }
     bool operator<= (Inst i) const { return bytes <= i.bytes; }
+    bool operator>= (Inst i) const { return bytes >= i.bytes; }
 };
 
 struct InstIter {

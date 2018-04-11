@@ -14,6 +14,12 @@ void EncodedMethod::load_detail(Reader r)
     debug_info_off = r.u32();
     inst_size = r.u32();
     insts = r.ptr();
+
+    if (! r.in_range(inst_size)) {
+        insts = nullptr;
+        inst_size = 0;
+        fputs("method size out of range\n", stderr);
+    }
 }
 
 void EncodedMethod::clear()

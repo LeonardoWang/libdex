@@ -101,10 +101,14 @@ uint32_t read_uint32(const uint8_t * data) { return data[0] + (data[1] << 8) + (
 int32_t read_int32(const uint8_t * data) { return (int32_t) read_uint32(data); }
 }
 
-vector<Inst> Inst::switch_targets() const
+vector<Inst> Inst::switch_targets(Inst l, Inst r) const
 {
     vector<Inst> ret;
     const uint8_t * payload = bytes + get_b() * 2;
+    if (payload < l.bytes || payload >= r.bytes) {
+        fputs("switch payload out of range\n", stderr);
+        return ret;
+    }
 
     if (op() == PackedSwitch) {
         if (payload[0] != 0 || payload[1] != 1) {
