@@ -28,6 +28,8 @@ public:
     vector<Method> methods;
     vector<Class> classes;
 
+    bool has_method(int idx) const { return 0 <= idx && idx < (int) methods.size(); }
+
     struct FormatError : public std::runtime_error
     {
         FormatError(const char * msg) : std::runtime_error(msg) { }

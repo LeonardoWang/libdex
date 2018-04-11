@@ -2,25 +2,35 @@
 
 #include "dex.h"
 #include "inst.h"
-#include "instformat.h"
+
+#include <iostream>
 
 const char * hello() { return "hello, world\n"; }
 
 namespace {
 vector<Dex*> dex_list;
-}
 
-void load_inst_conf(const char * path)
+IntArray * update_buffer(IntArray * & buffer, const vector<int> & vec)
 {
-    InstFormat::load(path);
+    delete [] (int32_t *) buffer;
+    buffer = (IntArray *) new int32_t [ vec.size() + 1 ];
+    buffer->len = vec.size();
+    std::copy(vec.cbegin(), vec.cend(), buffer->data);
+    return buffer;
+}
 }
 
 int32_t load_dex(const char * dex_file_name)
 {
-    Reader r = Reader::open_file(dex_file_name);
-    auto dex = new Dex(r);
-    dex_list.push_back(dex);
-    return dex_list.size() - 1;
+    try {
+        Reader r = Reader::open_file(dex_file_name);
+        auto dex = new Dex(r);
+        dex_list.push_back(dex);
+        return dex_list.size() - 1;
+    } catch (const std::exception & e) {
+        std::cerr << e.what() << std::endl;
+        return -1;
+    }
 }
 
 int32_t get_class_count(int32_t dex_id)
@@ -47,6 +57,7 @@ const char * get_method_full_name(int32_t dex_id, int32_t method_id)
 {
     static const char * buffer = nullptr;
 
+    if (! dex_list[dex_id]->has_method(method_id)) return nullptr;
     delete buffer;
     buffer = dex_list[dex_id]->methods[method_id].full_name().cstr();
     return buffer;
@@ -68,18 +79,14 @@ const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t m
     static IntArray * buffer = nullptr;
 
     const auto & method = dex_list[dex_id]->classes[class_id].methods(method_idx);
-    auto insts = Inst::load_method(method);
+    if (! method.valid()) return nullptr;
 
     vector<int> ret;
-    for (const auto & inst : insts)
-        if (inst.is_invoke())
+    for (const auto & inst : method)
+        if (inst.is_invoke() && inst.invoke_target() < (int) dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
-    delete [] (int32_t *) buffer;
-    buffer = (IntArray *) new int32_t [ ret.size() + 1 ];
-    buffer->len = ret.size();
-    std::copy(ret.cbegin(), ret.cend(), buffer->data);
-    return buffer;
+    return update_buffer(buffer, ret);
 }
 
 
@@ -88,16 +95,33 @@ const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, 
     static IntArray * buffer = nullptr;
 
     const auto & method = dex_list[dex_id]->classes[class_id].methods(method_idx);
-    auto insts = Inst::load_method(method);
+    if (! method.valid()) return nullptr;
 
     vector<int> ret;
-    for (const auto & inst : insts)
-        if (inst.is_libradar_invoke())
+    for (const auto & inst : method)
+        if (inst.is_libradar_invoke() && inst.invoke_target() < (int) dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
-    delete [] (int32_t *) buffer;
-    buffer = (IntArray *) new int32_t [ ret.size() + 1 ];
-    buffer->len = ret.size();
-    std::copy(ret.cbegin(), ret.cend(), buffer->data);
-    return buffer;
+    return update_buffer(buffer, ret);
+}
+
+vector<int> repackage_features(const Dex * dex, bool ordered);
+
+const IntArray * get_repackage_features(int32_t dex_id, int32_t ordered)
+{
+    static IntArray * buffer = nullptr;
+
+    auto ret = repackage_features(dex_list[dex_id], ordered != 0);
+    return update_buffer(buffer, ret);
+}
+
+vector<int> class_repackage_features(const Class & class_, bool ordered);
+
+const IntArray * get_class_repackage_features(int32_t dex_id, int32_t class_id, int32_t ordered)
+{
+    static IntArray * buffer = nullptr;
+
+    const auto & c = dex_list[dex_id]->classes[class_id];
+    auto ret = class_repackage_features(c, ordered != 0);
+    return update_buffer(buffer, ret);
 }

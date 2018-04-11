@@ -80,4 +80,33 @@ const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t m
  **/
 const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, int32_t method_idx);
 
+/**
+ *  Get a tree of basic block features.
+ *  The OPs will preserve their original order in a basic block if parameter `ordered` is `false`;
+ *  otherwise they'll be sorted based on numeric value.
+ *  The tree itself is always sorted (i.e. modifying class/method names will not alter the tree).
+ *  NOPs and pseudo instructions are ignored.
+ *  Function calls are considered as simple instructions and have no effect on basic block splitting.
+ *
+ *  Example tree:
+ *  (dex)
+ *   +- (class1)
+ *   |   +- (method1)
+ *   |   |   +- (block1)
+ *   |   |   |  +- [ op1, op1, op2, op1, op4 ]
+ *   |   |   +- (block2)
+ *   |   |      +- [ op5 ]
+ *   |   +- (method2) (empty)
+ *   +- (class2)
+ *       +- (method1)
+ *           +- (block1)
+ *              +- [ op3, op2 ]
+ *
+ *  Encoded array of above tree:
+ *      -1 , -2 , -3 , op1 , op1 , op2, op1, op4 , -3 , op5 , -2 , -1, -2, -3 , op3, op2
+ **/
+const IntArray * get_repackage_features(int32_t dex_id, int32_t ordered);
+
+const IntArray * get_class_repackage_features(int32_t dex_id, int32_t class_id, int32_t ordered);
+
 }
