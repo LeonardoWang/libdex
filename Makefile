@@ -8,7 +8,7 @@ SRC = capi.cpp			\
       ustring_encoding.cpp	\
       repackage.cpp
 
-CXX = g++ -std=c++17 -Wall -Wextra -fmax-errors=1 -g
+CXX = g++ -std=c++17 -Wall -Wextra -fmax-errors=1 -O2
 
 OBJ = $(SRC:%.cpp=build/%.o)
 DEP = $(OBJ:%.o=%.d)
