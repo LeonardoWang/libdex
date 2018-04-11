@@ -162,4 +162,5 @@ void Dex::init()
 Dex::~Dex()
 {
     delete hdr;
+    Reader::close_file(fd);
 }

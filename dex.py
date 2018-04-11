@@ -6,11 +6,11 @@ libdex = cdll.LoadLibrary(so_path)
 
 # These functions are defined in `capi.h/cpp`
 
-libdex.hello.argtypes = [ ]
-libdex.hello.restype = c_char_p
-
 libdex.load_dex.argstypes = [ c_char_p ]
 libdex.load_dex.restype = c_int32
+
+libdex.release_dex.argstype = [ c_int32 ]
+libdex.release_dex.restype = None
 
 libdex.get_class_count.argstypes = [ c_int32 ]
 libdex.get_class_count.restype = c_int32
@@ -72,6 +72,9 @@ class Dex:
 
         class_cnt = libdex.get_class_count(self.id)
         self.classes = [ DexClass(self, i) for i in range(class_cnt) ]
+
+    def __del__(self):
+        libdex.release_dex(self.id)
 
     def get_repackage_features(self, ordered = False):
         ptr = libdex.get_repackage_features(self.id, 1 if ordered else 0)

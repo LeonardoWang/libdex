@@ -39,7 +39,9 @@ public:
     /** Check whether this reader is in valid state **/
     bool is_valid() { return off >= 0; }
 
-    static Reader open_file(const char * file_name);
+    static int open_file(const char * file_name);
+    static void close_file(int fd);
+    static Reader from_fd(int fd);
 
 private:
     const uint8_t * data;

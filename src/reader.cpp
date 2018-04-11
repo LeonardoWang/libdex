@@ -85,12 +85,21 @@ vector<uint8_t> Reader::bytes(int n)
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
-Reader Reader::open_file(const char * file_name)  // FIXME: POSIX only
+int Reader::open_file(const char * file_name)  // FIXME: POSIX only
+{
+    return open(file_name, O_RDONLY);
+}
+
+void Reader::close_file(int fd)
+{
+    if (fd > 0) close(fd);
+}
+
+Reader Reader::from_fd(int fd)
 {
     Reader ret(nullptr, -1);
-
-    int fd = open(file_name, O_RDONLY);
     if (fd == -1) return ret;
     struct stat st;
     fstat(fd, & st);

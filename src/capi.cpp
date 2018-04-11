@@ -5,8 +5,6 @@
 
 #include <iostream>
 
-const char * hello() { return "hello, world\n"; }
-
 namespace {
 vector<Dex*> dex_list;
 
@@ -18,19 +16,38 @@ IntArray * update_buffer(IntArray * & buffer, const vector<int> & vec)
     std::copy(vec.cbegin(), vec.cend(), buffer->data);
     return buffer;
 }
+
+int insert_dex(Dex * dex)
+{
+    for (unsigned i = 0; i < dex_list.size(); ++i) {
+        if (dex_list[i] == nullptr) {
+            dex_list[i] = dex;
+            return i;
+        }
+    }
+
+    dex_list.push_back(dex);
+    return dex_list.size() - 1;
+}
 }
 
 int32_t load_dex(const char * dex_file_name)
 {
     try {
-        Reader r = Reader::open_file(dex_file_name);
-        auto dex = new Dex(r);
-        dex_list.push_back(dex);
-        return dex_list.size() - 1;
+        int fd = Reader::open_file(dex_file_name);
+        Reader r = Reader::from_fd(fd);
+        auto dex = new Dex(r, fd);
+        return insert_dex(dex);
     } catch (const std::exception & e) {
         std::cerr << e.what() << std::endl;
         return -1;
     }
+}
+
+void release_dex(int32_t dex_id)
+{
+    delete dex_list[dex_id];
+    dex_list[dex_id] = nullptr;
 }
 
 int32_t get_class_count(int32_t dex_id)

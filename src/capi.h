@@ -27,18 +27,15 @@ struct IntArray {
 
 extern "C" {
 
-const char * hello();
-
-/**
- *  Load definition of instructions.
- *  This function must be called before any disassembly job.
- **/
-void load_inst_conf(const char * path);
-
 /**
  *  Load a dex file; return its ID.
  **/
 int32_t load_dex(const char * dex_file_name);
+
+/**
+ *  Release a dex file
+ **/
+void release_dex(int32_t dex_id);
 
 /**
  *  Get number of classes defined in a dex file.

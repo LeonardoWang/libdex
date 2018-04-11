@@ -17,7 +17,7 @@ struct DexHeader;
  **/
 class Dex {
 public:
-    Dex(Reader r) : r(r) { init(); }
+    Dex(Reader r, int fd = -1) : r(r), fd(fd) { init(); }
     Dex(const uint8_t * data) : r(data) { init(); }
     ~Dex();
 
@@ -38,6 +38,7 @@ public:
 private:
     Reader r;
     DexHeader * hdr;
+    int fd = -1;
 
     void init();
 };
