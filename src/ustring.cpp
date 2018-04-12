@@ -95,15 +95,13 @@ String operator+ (const String & s1, const String & s2)
 String operator+ (const String & s1, const char * s2)
 {
     if (! s2) return s1;
-    if (! s1.ctnt) return String(s2);
-    return String(String::cat_ctnt(s1.ctnt, String::from_cstr(s2)));
+    return s1 + String(s2);
 }
 
 String operator+ (const char * s1, const String & s2)
 {
     if (! s1) return s2;
-    if (! s2.ctnt) return String(s1);
-    return String(String::cat_ctnt(String::from_cstr(s1), s2.ctnt));
+    return String(s1) + s2;
 }
 
 String::Content * String::prep_ctnt(int len)
