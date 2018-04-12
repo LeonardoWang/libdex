@@ -150,12 +150,12 @@ def test(file_name):
     dex = Dex(file_name)
     for class_ in dex.classes:
         print(class_.name())
-        #for method in class_.methods():
-        #    print('    ' + method.name())
-        #    for im in method.get_invoked_methods():
-        #        print('        ' + im)
-        f = class_.get_repackage_features()
-        print(f)
+        for method in class_.methods():
+            print('    ' + method.name())
+            for im in method.get_invoked_methods():
+                print('        ' + im)
+        #f = class_.get_repackage_features()
+        #print(f)
 
 import sys
 

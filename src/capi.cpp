@@ -10,7 +10,7 @@ vector<Dex*> dex_list;
 
 IntArray * update_buffer(IntArray * & buffer, const vector<int> & vec)
 {
-    delete [] (int32_t *) buffer;
+    delete[] (int32_t *) buffer;
     buffer = (IntArray *) new int32_t [ vec.size() + 1 ];
     buffer->len = vec.size();
     std::copy(vec.cbegin(), vec.cend(), buffer->data);
@@ -59,7 +59,7 @@ const char * get_class_name(int32_t dex_id, int32_t class_id)
 {
     static const char * buffer = nullptr;
 
-    delete buffer;
+    delete[] buffer;
     buffer = dex_list[dex_id]->classes[class_id].name.cstr();
     return buffer;
 }
@@ -75,7 +75,7 @@ const char * get_method_full_name(int32_t dex_id, int32_t method_id)
     static const char * buffer = nullptr;
 
     if (! dex_list[dex_id]->has_method(method_id)) return nullptr;
-    delete buffer;
+    delete[] buffer;
     buffer = dex_list[dex_id]->methods[method_id].full_name().cstr();
     return buffer;
 }
@@ -84,7 +84,7 @@ const char * get_class_method_full_name(int32_t dex_id, int32_t class_id, int32_
 {
     static const char * buffer = nullptr;
 
-    delete buffer;
+    delete[] buffer;
     auto dex = dex_list[dex_id];
     int method_id = dex->classes[class_id].methods(method_idx).method_id;
     buffer = dex->methods[method_id].full_name().cstr();

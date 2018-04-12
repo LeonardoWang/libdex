@@ -67,5 +67,5 @@ struct InstIter {
     InstIter & operator ++ () { bytes += Inst(bytes).length(); return * this; }
     InstIter operator ++ (int) { return InstIter { bytes + Inst(bytes).length() }; }
     bool operator == (InstIter it) { return bytes == it.bytes; }
-    bool operator != (InstIter it) { return bytes != it.bytes; }
+    bool operator != (InstIter it) { return bytes < it.bytes; }
 };

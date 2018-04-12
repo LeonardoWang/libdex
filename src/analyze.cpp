@@ -15,11 +15,6 @@ vector<BasicBlock> split_basic_blocks(const EncodedMethod & method)
     set<Inst> split_points;
 
     for (auto inst : method) {
-        if (inst >= i_end) {
-            fputs("instruction exceeds end of method\n", stderr);
-            break;
-        }
-
         if (inst.is_return()) {
             split_points.insert(inst.next());
 
