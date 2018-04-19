@@ -24,6 +24,9 @@ libdex.so : $(OBJ)
 test : $(OBJ) src/main.cpp
 	$(CXX) $^ -o test
 
+doc : .FORCE
+	doxygen
+
 .PHONY : run-test
 run-test : test
 	LD_LIBRARY_PATH=${PWD} ./test
@@ -38,3 +41,6 @@ build/%.o : src/%.cpp
 clean :
 	-rm -r build
 	-rm test
+
+.PHONY : .FORCE
+.FORCE:

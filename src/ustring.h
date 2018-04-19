@@ -1,5 +1,9 @@
 #pragma once
 
+/** @file
+ *  Unicode string.
+ **/
+
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>

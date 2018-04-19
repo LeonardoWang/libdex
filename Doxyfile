@@ -1,0 +1,15 @@
+PROJECT_NAME           = "libdex"
+PROJECT_BRIEF          = "DEX disassembler"
+OUTPUT_DIRECTORY       = "doc"
+ALLOW_UNICODE_NAMES    = YES
+OUTPUT_LANGUAGE        = English
+ALWAYS_DETAILED_SEC    = YES
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+
+RECURSIVE              = YES
+EXCLUDE                = doc
+
+GENERATE_LATEX         = NO
+
+USE_MDFILE_AS_MAINPAGE = doc.md

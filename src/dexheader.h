@@ -1,7 +1,9 @@
 #pragma once
 
 /** @file
- *  Deal with dex file header
+ *  Deal with dex file header.
+ *  See Android documentation for details.
+ *      https://source.android.com/devices/tech/dalvik/dex-format
  **/
 
 #include "reader.h"

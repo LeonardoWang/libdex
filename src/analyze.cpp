@@ -12,6 +12,8 @@ vector<BasicBlock> split_basic_blocks(const EncodedMethod & method)
     auto i_begin = * method.begin();
     auto i_end = * method.end();
 
+    /* find entry/exit points */
+
     set<Inst> split_points;
 
     for (auto inst : method) {
@@ -35,6 +37,8 @@ vector<BasicBlock> split_basic_blocks(const EncodedMethod & method)
             split_points.insert(inst.branch_target());
         }
     }
+
+    /* split on entry/exit points */
 
     vector<BasicBlock> ret;
     Inst prev = i_begin;

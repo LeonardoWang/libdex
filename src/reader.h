@@ -1,5 +1,9 @@
 #pragma once
 
+/** @file
+ *  Binary stream reader.
+ **/
+
 #include "ustring.h"
 
 #include <vector>

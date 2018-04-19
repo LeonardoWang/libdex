@@ -2,10 +2,11 @@
 
 /** @file
  *
- *  C-style API (for Python)
+ *  C-style APIs (for Python)
  *
  *  In general, any object in C-style API is identified by one or more IDs or indices.
- *  All IDs are sequential and starts from 0.
+ *  All IDs are sequential and starts from 0, except that DEX IDs may be reused after releasing.
+ *  Any return value less than 0 indicates that an error occurred.
  *  ID of dex files are returned by their loading function.
  *  ID of classes are local to dex file.
  *  Methods has two representation form:
@@ -15,7 +16,9 @@
  *
  *  Strings and arrays returned by C-style APIs are stored in internal buffers.
  *  As a result the caller should not modify or free them,
- *  and the data is available until next invoke.
+ *  and the data is available until next invocation.
+ *
+ *  NOTE: remember to release DEX objects.
  **/
 
 #include <cstdint>
@@ -104,6 +107,10 @@ const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, 
  **/
 const IntArray * get_repackage_features(int32_t dex_id, int32_t ordered);
 
+/**
+ *  Get a tree of basic block features in a class.
+ *  The format is indentical to `get_repackage_features`.
+ **/
 const IntArray * get_class_repackage_features(int32_t dex_id, int32_t class_id, int32_t ordered);
 
 }
