@@ -34,9 +34,8 @@ int insert_dex(Dex * dex)
 int32_t load_dex(const char * dex_file_name)
 {
     try {
-        int fd = Reader::open_file(dex_file_name);
-        Reader r = Reader::from_fd(fd);
-        auto dex = new Dex(r, fd);
+        Reader r = Reader::open_file(dex_file_name);
+        auto dex = new Dex(r);
         return insert_dex(dex);
     } catch (const std::exception & e) {
         std::cerr << e.what() << std::endl;
@@ -46,6 +45,7 @@ int32_t load_dex(const char * dex_file_name)
 
 void release_dex(int32_t dex_id)
 {
+    dex_list[dex_id]->munmap();
     delete dex_list[dex_id];
     dex_list[dex_id] = nullptr;
 }

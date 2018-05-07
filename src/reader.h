@@ -47,9 +47,9 @@ public:
 
     bool in_range(int64_t pos) { return pos < size - off; }
 
-    static int open_file(const char * file_name);
-    static void close_file(int fd);
-    static Reader from_fd(int fd);
+    void munmap();
+
+    static Reader open_file(const char * file_name);
 
 private:
     const uint8_t * data;

@@ -23,10 +23,12 @@ struct DexHeader;
 class Dex {
 public:
     /** Load `mmap`-ed DEX file from disk **/
-    Dex(Reader r, int fd = -1) : r(r), fd(fd) { init(); }
+    Dex(Reader r) : r(r) { init(); }
     /** Load DEX from memory buffer **/
     Dex(const uint8_t * data) : r(data) { init(); }
+
     ~Dex();
+    void munmap() { r.munmap(); }
 
     /** String literals **/
     vector<String> strings;
@@ -54,7 +56,6 @@ public:
 private:
     Reader r;
     DexHeader * hdr;
-    int fd = -1;
 
     void init();
 };
