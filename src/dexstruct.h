@@ -42,6 +42,10 @@ struct EncodedField {
 /**
  *  Definition of method in class
  *  Methods with identical name may contain different instructions in base and derived classes.
+ *
+ *  This class offers `begin()` and `end()` functions in a container's manner and
+ *  therefore you can get the instructions with a range-based for loop:
+ *      for (Inst inst : encoded_method) { ... }
  **/
 struct EncodedMethod {
     int method_id;

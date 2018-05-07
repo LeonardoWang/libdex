@@ -1,6 +1,7 @@
 .*.swp
 __pycache__/
 build/
-classes.dex
+doc/
+*.dex
 libdex.so
 test

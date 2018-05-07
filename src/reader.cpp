@@ -87,28 +87,29 @@ vector<uint8_t> Reader::bytes(int n)
 #include <sys/stat.h>
 #include <unistd.h>
 
-int Reader::open_file(const char * file_name)  // FIXME: POSIX only
-{
-    return open(file_name, O_RDONLY);
-}
-
-void Reader::close_file(int fd)
-{
-    if (fd > 0) close(fd);
-}
-
-Reader Reader::from_fd(int fd)
+Reader Reader::open_file(const char * file_name)
 {
     Reader ret(nullptr, -1);
+
+    int fd = open(file_name, O_RDONLY);
     if (fd == -1) return ret;
+
     struct stat st;
     fstat(fd, & st);
-    if (st.st_size == 0) return ret;
+    if (st.st_size == 0) { close(fd); return ret; }
+
     auto bytes = mmap(nullptr, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
     if (bytes == nullptr) return ret;
 
     ret.data = (const uint8_t *) bytes;
     ret.off = 0;
     ret.size = st.st_size;
     return ret;
+}
+
+void Reader::munmap()
+{
+    ::munmap((void *) data, size);
+    off = -1;
 }

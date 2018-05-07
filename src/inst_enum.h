@@ -1,5 +1,9 @@
 #pragma once
 
+/** @file
+ *  Human-friendly enum names of op codes.
+ **/
+
 enum OpCode {
     Nop                     = 0x00,
     Move                    = 0x01,
