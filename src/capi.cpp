@@ -45,6 +45,7 @@ int32_t load_dex(const char * dex_file_name)
 
 void release_dex(int32_t dex_id)
 {
+    if (dex_id < 0) return;
     dex_list[dex_id]->munmap();
     delete dex_list[dex_id];
     dex_list[dex_id] = nullptr;
