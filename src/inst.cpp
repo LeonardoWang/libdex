@@ -60,6 +60,13 @@ bool Inst::is_invoke() const
     return false;
 }
 
+bool Inst::is_read_field() const
+{
+    if (Iget <= op() && op() <= IgetShort) return true;
+    if (Sget <= op() && op() <= SgetShort) return true;
+    return false;
+}
+
 bool Inst::is_return() const
 {
     return (ReturnVoid <= op() && op() <= ReturnObject);
@@ -83,6 +90,11 @@ bool Inst::is_branch() const
 bool Inst::is_switch() const
 {
     return (op() == PackedSwitch || op() == SparseSwitch);
+}
+
+int Inst::field() const
+{
+    return (op() < Sget ? get_c() : get_b());
 }
 
 Inst Inst::branch_target() const

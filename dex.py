@@ -12,6 +12,12 @@ libdex.load_dex.restype = c_int32
 libdex.release_dex.argstype = [ c_int32 ]
 libdex.release_dex.restype = None
 
+libdex.get_string_count.argstypes = [ c_int32 ]
+libdex.get_string_count.restype = c_int32
+
+libdex.get_string.argstypes = [ c_int32, c_int32 ]
+libdex.get_string.restype = c_char_p
+
 libdex.get_class_count.argstypes = [ c_int32 ]
 libdex.get_class_count.restype = c_int32
 
@@ -27,8 +33,17 @@ libdex.get_method_full_name.restype = c_char_p
 libdex.get_class_method_full_name.argstypes = [ c_int32, c_int32, c_int32 ]
 libdex.get_class_method_full_name.restype = c_char_p
 
+libdex.get_field_full_name.argstypes = [ c_int32, c_int32 ]
+libdex.get_field_full_name.restype = c_char_p
+
+libdex.get_const_strings.argstypes = [ c_int32, c_int32, c_int32 ]
+libdex.get_const_strings.restype = POINTER(c_int32)
+
 libdex.get_invoked_methods.argstypes = [ c_int32, c_int32, c_int32 ]
 libdex.get_invoked_methods.restype = POINTER(c_int32)
+
+libdex.get_read_fields.argstypes = [ c_int32, c_int32, c_int32 ]
+libdex.get_read_fields.restype = POINTER(c_int32)
 
 libdex.get_invoked_methods_libradar.argstypes = [ c_int32, c_int32, c_int32 ]
 libdex.get_invoked_methods_libradar.restype = POINTER(c_int32)
@@ -70,11 +85,29 @@ class Dex:
         self.id = libdex.load_dex(dex_file_name)
         assert self.id >= 0
 
+        string_cnt = libdex.get_string_count(self.id)
+        self._strings = [ None ] * string_cnt
+
         class_cnt = libdex.get_class_count(self.id)
         self.classes = [ DexClass(self, i) for i in range(class_cnt) ]
 
     def __del__(self):
         libdex.release_dex(self.id)
+
+    def get_string(self, string_id):
+        if self._strings[string_id] is None:
+            self._strings[string_id] = libdex.get_string(self.id, string_id).decode('utf8')
+        return self._strings[string_id]
+
+    def strings(self):
+        self._strings = [ self.get_string(i) for i in range(len(self._strings)) ]
+        return self._strings
+
+    def get_method_name(self, method_id):
+        return libdex.get_method_full_name(self.id, method_id).decode('utf8')
+
+    def get_field_name(self, field_id):
+        return libdex.get_field_full_name(self.id, field_id).decode('utf8')
 
     def get_repackage_features(self, ordered = False):
         ptr = libdex.get_repackage_features(self.id, 1 if ordered else 0)
@@ -122,16 +155,29 @@ class DexMethod:
             self._name = name_bytes.decode('utf8')
         return self._name
 
-    def get_invoked_methods(self):
-        ptr = libdex.get_invoked_methods(self.dex.id, self.class_.id, self.idx)
-        method_ids = decode_int_array(ptr)
+    def get_const_string_ids(self):
+        ptr = libdex.get_const_strings(self.dex.id, self.class_.id, self.idx)
+        return decode_int_array(ptr)
 
-        ret = [ ]
-        for method_id in method_ids:
-            b = libdex.get_method_full_name(self.dex.id, method_id)
-            ret.append(b.decode('utf8'))
-        
-        return ret
+    def get_const_strings(self):
+        ids = self.get_const_string_ids()
+        return [ self.dex.get_string(i) for i in ids ]
+
+    def get_invoked_method_ids(self):
+        ptr = libdex.get_invoked_methods(self.dex.id, self.class_.id, self.idx)
+        return decode_int_array(ptr)
+
+    def get_invoked_methods(self):
+        ids = self.get_invoked_method_ids()
+        return [ self.dex.get_method_name(i) for i in ids ]
+
+    def get_read_field_ids(self):
+        ptr = libdex.get_read_fields(self.dex.id, self.class_.id, self.idx)
+        return decode_int_array(ptr)
+
+    def get_read_fields(self):
+        ids = self.get_read_field_ids()
+        return [ self.dex.get_field_name(i) for i in ids ]
 
     def get_invoked_methods_libradar(self):
         ptr = libdex.get_invoked_methods_libradar(self.dex.id, self.class_.id, self.idx)
@@ -151,9 +197,12 @@ def test(file_name):
     for class_ in dex.classes:
         print(class_.name())
         for method in class_.methods():
-            print('    ' + method.name())
-            for im in method.get_invoked_methods():
-                print('        ' + im)
+            #print('    ' + method.name())
+            print('        %s' % method.get_const_strings())
+            #for im in method.get_invoked_methods():
+            #    print('        ' + im)
+            #for f in method.get_read_fields():
+            #    print('        ' + f)
         #f = class_.get_repackage_features()
         #print(f)
 

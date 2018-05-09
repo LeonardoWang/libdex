@@ -55,6 +55,7 @@ struct Inst {
     bool is_const_string() const;
     /** Check if this instruction is invoking a function **/
     bool is_invoke() const;
+    bool is_read_field() const;
     /** Check if this is a `return` instruction **/
     bool is_return() const;
     /** Check if this is a `throw` instruction **/
@@ -75,8 +76,10 @@ struct Inst {
      **/
     bool is_switch() const;
 
+    int string_idx() const { return get_b(); }
     /** Return the index of invoked method for a invoking instruction **/
     int invoke_target() const { return get_b(); }
+    int field() const;
     /** Return the target address of a unconditional jump instruction **/
     Inst goto_target() const { return Inst(bytes + (int64_t) get_a() * 2); }
     /** Return the target address of a conditional jump instruction **/

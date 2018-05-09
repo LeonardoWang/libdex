@@ -40,6 +40,10 @@ int32_t load_dex(const char * dex_file_name);
  **/
 void release_dex(int32_t dex_id);
 
+int32_t get_string_count(int32_t dex_id);
+
+const char * get_string(int32_t dex_id, int32_t string_id);
+
 /**
  *  Get number of classes defined in a dex file.
  *  Their IDs are 0, 1, 2, ... , (return_value - 1).
@@ -62,10 +66,15 @@ int32_t get_methods_count(int32_t dex_id, int32_t class_id);
  **/
 const char * get_method_full_name(int32_t dex_id, int32_t method_id);
 
+const char * get_field_full_name(int32_t dex_id, int32_t field_id);
+
 /**
  *  Get the name of a method from its class-wise index. (e.g. `Ljava/lang/String;-><init>`)
  **/
 const char * get_class_method_full_name(int32_t dex_id, int32_t class_id, int32_t method_idx);
+
+/** Get all used constant strings in a method; return an array of string indices **/
+const IntArray * get_const_strings(int32_t dex_id, int32_t class_id, int32_t method_idx);
 
 /**
  *  Get all invoked methods in a method; return an array of their dex-wise ID.
@@ -73,6 +82,8 @@ const char * get_class_method_full_name(int32_t dex_id, int32_t class_id, int32_
  *  The order of return value is guaranteed to match the byte code.
  **/
 const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t method_idx);
+
+const IntArray * get_read_fields(int32_t dex_id, int32_t class_id, int32_t method_idx);
 
 
 /**

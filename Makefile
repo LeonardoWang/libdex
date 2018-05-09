@@ -18,10 +18,7 @@ all : libdex.so test
 libdex.so : $(OBJ)
 	$(CXX) $^ -shared -o $@
 
-#test : $(OBJ) libdex.so src/main.cpp
-#	$(CXX) src/main.cpp -L. -ldex -o $@
-
-test : $(OBJ) src/main.cpp
+test : $(OBJ) main.cpp
 	$(CXX) $^ -o test
 
 doc : .FORCE

@@ -119,8 +119,19 @@ String::Content * String::from_mutf8(const uint8_t * str, int len)
     return ret;
 }
 
-char * String::to_utf8() const
+namespace {
+const char * new_empty_str()
 {
+    char * ret = new char[1];
+    ret[0] = '\0';
+    return ret;
+}
+}
+
+const char * String::to_utf8() const
+{
+    if (! ctnt) return new_empty_str();
+
     int len = 0;
     for (int i = 0; i < ctnt->len; ++i) {
         len += 1;

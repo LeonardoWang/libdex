@@ -30,8 +30,8 @@ public:
 
     String slice(int l, int r) const;
 
-    char * c_str() const;
-    char * cstr() const { return c_str(); }
+    const char * c_str() const;
+    const char * cstr() const { return c_str(); }
 
     bool empty() const { return ctnt; }
     int size() const { return ctnt ? ctnt->len : 0; }
@@ -66,7 +66,7 @@ private:
 
     static Content * cat_ctnt(const Content * c1, const Content * c2);
 
-    char * to_utf8() const;
+    const char * to_utf8() const;
 
 public:
     void debug_print() const;

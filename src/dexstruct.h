@@ -19,6 +19,8 @@ struct Field {
     String class_;
     String type;
     String name;
+
+    String full_name() const { return class_ + "->" + name; }
 };
 
 /** Declaration of method **/

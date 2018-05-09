@@ -3,6 +3,7 @@
 #include "dex.h"
 #include "inst.h"
 
+#include <cstdio>
 #include <iostream>
 
 namespace {
@@ -51,6 +52,20 @@ void release_dex(int32_t dex_id)
     dex_list[dex_id] = nullptr;
 }
 
+int32_t get_string_count(int32_t dex_id)
+{
+    return dex_list[dex_id]->strings.size();
+}
+
+const char * get_string(int32_t dex_id, int32_t string_id)
+{
+    static const char * buffer = nullptr;
+
+    delete[] buffer;
+    buffer = dex_list[dex_id]->strings[string_id].cstr();
+    return buffer;
+}
+
 int32_t get_class_count(int32_t dex_id)
 {
     return dex_list[dex_id]->classes.size();
@@ -81,6 +96,16 @@ const char * get_method_full_name(int32_t dex_id, int32_t method_id)
     return buffer;
 }
 
+const char * get_field_full_name(int32_t dex_id, int32_t field_id)
+{
+    static const char * buffer = nullptr;
+
+    if (field_id < 0 || field_id >= (ssize_t) dex_list[dex_id]->fields.size()) return nullptr;
+    delete[] buffer;
+    buffer = dex_list[dex_id]->fields[field_id].full_name().cstr();
+    return buffer;
+}
+
 const char * get_class_method_full_name(int32_t dex_id, int32_t class_id, int32_t method_idx)
 {
     static const char * buffer = nullptr;
@@ -92,6 +117,21 @@ const char * get_class_method_full_name(int32_t dex_id, int32_t class_id, int32_
     return buffer;
 }
 
+const IntArray * get_const_strings(int32_t dex_id, int32_t class_id, int32_t method_idx)
+{
+    static IntArray * buffer = nullptr;
+
+    const auto & method = dex_list[dex_id]->classes[class_id].methods(method_idx);
+    if (! method.valid()) return nullptr;
+
+    vector<int> ret;
+    for (const auto & inst : method)
+        if (inst.is_const_string() && inst.string_idx() < (ssize_t) dex_list[dex_id]->strings.size())
+            ret.push_back(inst.string_idx());
+
+    return update_buffer(buffer, ret);
+}
+
 const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t method_idx)
 {
     static IntArray * buffer = nullptr;
@@ -101,12 +141,26 @@ const IntArray * get_invoked_methods(int32_t dex_id, int32_t class_id, int32_t m
 
     vector<int> ret;
     for (const auto & inst : method)
-        if (inst.is_invoke() && inst.invoke_target() < (int) dex_list[dex_id]->methods.size())
+        if (inst.is_invoke() && inst.invoke_target() < (ssize_t) dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
     return update_buffer(buffer, ret);
 }
 
+const IntArray * get_read_fields(int32_t dex_id, int32_t class_id, int32_t method_idx)
+{
+    static IntArray * buffer = nullptr;
+
+    const auto & method = dex_list[dex_id]->classes[class_id].methods(method_idx);
+    if (! method.valid()) return nullptr;
+
+    vector<int> ret;
+    for (const auto & inst : method)
+        if (inst.is_read_field() && inst.field() < (ssize_t) dex_list[dex_id]->fields.size())
+            ret.push_back(inst.field());
+
+    return update_buffer(buffer, ret);
+}
 
 const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, int32_t method_idx)
 {
@@ -117,7 +171,7 @@ const IntArray * get_invoked_methods_libradar(int32_t dex_id, int32_t class_id, 
 
     vector<int> ret;
     for (const auto & inst : method)
-        if (inst.is_libradar_invoke() && inst.invoke_target() < (int) dex_list[dex_id]->methods.size())
+        if (inst.is_libradar_invoke() && inst.invoke_target() < (ssize_t) dex_list[dex_id]->methods.size())
             ret.push_back(inst.invoke_target());
 
     return update_buffer(buffer, ret);

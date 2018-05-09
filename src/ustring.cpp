@@ -64,7 +64,7 @@ String String::slice(int l, int r) const
     return String(ret);
 }
 
-char * String::c_str() const
+const char * String::c_str() const
 {
     return to_utf8();
 }
