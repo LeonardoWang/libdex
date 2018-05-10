@@ -68,7 +68,7 @@ struct EncodedMethod {
     void clear();
     bool valid() const { return method_id >= 0; }
 
-    InstIter begin() const { return InstIter(insts ? insts : nullptr); }
+    InstIter begin() const { return InstIter(insts); }
     InstIter end() const { return InstIter(insts ? insts + inst_size * 2 : nullptr); }
 };
 

@@ -20,6 +20,8 @@ void EncodedMethod::load_detail(Reader r)
         inst_size = 0;
         fputs("method size out of range\n", stderr);
     }
+
+    //printf("method range: %lx - %lx\n", insts, (const uint8_t *) insts + inst_size);
 }
 
 void EncodedMethod::clear()

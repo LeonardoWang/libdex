@@ -5,8 +5,10 @@
 
 #include <cstdio>
 
-int Inst::length() const
+ssize_t Inst::length() const
 {
+    static bool first_error = true;
+
     if (op() == 0) {
         if (bytes[1] == 0) {  // nop
             return 2;
@@ -22,13 +24,16 @@ int Inst::length() const
         } else if (bytes[1] == 3) {  // fill-array-data-payload
             uint32_t w = (bytes[3] << 8) + bytes[2];
             uint32_t n = (bytes[7] << 24) + (bytes[6] << 16) + (bytes[5] << 8) + bytes[4];
-            int len = 8 + w * n;
+            ssize_t len = 8 + w * n;
             if (len % 2 == 1) ++len;  // padding
             return len;
 
         }
 
-        fprintf(stderr, "Unexpected NOP type %02x\n", bytes[1]);
+        if (first_error) {
+            fprintf(stderr, "Unexpected NOP type %02x\n", bytes[1]);
+            first_error = false;
+        }
         return 2;
     }
 

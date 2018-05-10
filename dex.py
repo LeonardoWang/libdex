@@ -198,7 +198,7 @@ def test(file_name):
         print(class_.name())
         for method in class_.methods():
             #print('    ' + method.name())
-            print('        %s' % method.get_const_strings())
+            print('        %s' % method.get_const_string_ids())
             #for im in method.get_invoked_methods():
             #    print('        ' + im)
             #for f in method.get_read_fields():

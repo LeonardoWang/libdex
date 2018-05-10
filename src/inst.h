@@ -29,7 +29,7 @@ struct Inst {
     /** The op code of this instruction **/
     int op() const { return bytes[0]; }
     /** Length of instruction in bytes **/
-    int length() const;
+    ssize_t length() const;
 
     uint64_t get_a() const { return inst_types[op()].get->a(bytes); }   ///< Get oprand A
     uint64_t get_b() const { return inst_types[op()].get->b(bytes); }   ///< Get oprand B
