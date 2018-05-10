@@ -1,7 +1,9 @@
 .*.swp
 __pycache__/
-build/
 doc/
 *.dex
 libdex.so
 test
+/.idea
+/cmake-build-debug
+/build
