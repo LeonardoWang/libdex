@@ -25,5 +25,8 @@ set(LIBDEX_SRC
         )
 
 add_library(dex ${LIBDEX_SRC})
+target_include_directories(dex INTERFACE src)
 
 add_executable(libdex_test ${LIBDEX_SRC} main.cpp)
+
+add_subdirectory(tools)

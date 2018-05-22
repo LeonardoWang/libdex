@@ -33,7 +33,7 @@ public:
     const char * c_str() const;
     const char * cstr() const { return c_str(); }
 
-    bool empty() const { return ctnt; }
+    bool empty() const { return !ctnt; }
     int size() const { return ctnt ? ctnt->len : 0; }
     int length() const { return size(); }
 
