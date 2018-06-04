@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.7)
 project(libdex)
 
+set(CMAKE_INSTALL_PREFIX "/")
+
 set(CMAKE_CXX_STANDARD 17)
 
 foreach(i IN ITEMS
@@ -24,8 +26,11 @@ set(LIBDEX_SRC
         src/repackage.cpp
         )
 
-add_library(dex ${LIBDEX_SRC})
+add_library(dex SHARED ${LIBDEX_SRC})
 target_include_directories(dex INTERFACE src)
+
+install(TARGETS dex DESTINATION ./)
+install(FILES dex.py DESTINATION ./)
 
 add_executable(libdex_test ${LIBDEX_SRC} main.cpp)
 
