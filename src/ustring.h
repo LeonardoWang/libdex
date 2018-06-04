@@ -39,11 +39,6 @@ public:
 
     int rfind(Char ch) const;
 
-    struct EncodingError : public std::runtime_error {
-        EncodingError(const char * msg);
-        EncodingError(const char * msg, const uint8_t * data, int len);
-    };
-
 private:
     struct Content {
         int32_t ref_cnt;

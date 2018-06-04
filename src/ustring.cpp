@@ -1,17 +1,5 @@
 #include "ustring.h"
 
-String::EncodingError::EncodingError(const char * msg)
-    : std::runtime_error(msg)
-{ }
-
-String::EncodingError::EncodingError(const char * msg, const uint8_t * data, int len)
-    : std::runtime_error(msg)
-{
-    for (int i = 0; i < len; ++i)
-        printf("%2x ", data[i]);
-    putchar('\n');
-}
-
 String::String(const String & str)
 {
     ctnt = str.ctnt;
@@ -29,7 +17,7 @@ String::String(const uint8_t * data, int len, int encoding)
     switch (encoding) {
         case UTF8:  ctnt = from_utf8(data, len);  break;
         case MUTF8: ctnt = from_mutf8(data, len); break;
-        default: throw EncodingError("unsupported encoding", data, len);
+        default: throw std::runtime_error("unsupported encoding");
     }
 }
 

@@ -11,47 +11,50 @@ inline Char decode_utf8_following_byte(uint8_t ch) { return (ch & 0b0011'1111); 
 inline Char decode_utf8_2_bytes_header(uint8_t ch) { return (ch & 0b0001'1111); }
 inline Char decode_utf8_3_bytes_header(uint8_t ch) { return (ch & 0b0000'1111); }
 
-Char get_utf8_2_bytes(const uint8_t * data)
+Char get_utf8_2_bytes(const uint8_t *& cur, const uint8_t * end)
 {
     // 110x xxxx  10xx xxxx
+    uint8_t one = *cur++;
+    uint8_t two = cur < end ? *cur++ : 0;
 
-    if (! is_utf8_following_byte(data[1]))
-        throw String::EncodingError("not utf-8 2-bytes code point", data, 2);
+    // no following bytes sanity check
 
-    Char u1 = decode_utf8_2_bytes_header(data[0]);
-    Char u2 = decode_utf8_following_byte(data[1]);
+    Char u1 = decode_utf8_2_bytes_header(one);
+    Char u2 = decode_utf8_following_byte(two);
     return (u1 << 6) | u2;
 }
 
-Char get_utf8_3_bytes(const uint8_t * data)
+Char get_utf8_3_bytes(const uint8_t *& cur, const uint8_t * end)
 {
     // 1110 xxxx  10xx xxxx  10xx xxxx
+    uint8_t one = *cur++;
+    uint8_t two = cur < end ? *cur++ : 0;
+    uint8_t three = cur < end ? *cur++ : 0;
 
-    if (! is_utf8_following_byte(data[1]) || ! is_utf8_following_byte(data[1]))
-        throw String::EncodingError("not utf-8 3-bytes code point", data, 3);
+    // no following bytes sanity check
 
-    Char u1 = decode_utf8_3_bytes_header(data[0]);
-    Char u2 = decode_utf8_following_byte(data[1]);
-    Char u3 = decode_utf8_following_byte(data[2]);
+    Char u1 = decode_utf8_3_bytes_header(one);
+    Char u2 = decode_utf8_following_byte(two);
+    Char u3 = decode_utf8_following_byte(three);
     return (u1 << 12) | (u2 << 6) | u3;
 }
 
-Char get_utf8_code_point(const uint8_t * str, int * pp)
+Char get_utf8_code_point(const uint8_t *& cur, const uint8_t * end)
 {
-    int & p = * pp;
+    if (is_utf8_single_byte(*cur)) {
+        return *cur++;
 
-    if (is_utf8_single_byte(str[p])) {
-        return str[p++];
+    } else if (is_utf8_2_bytes_header(*cur)) {
+        return get_utf8_2_bytes(cur, end);
 
-    } else if (is_utf8_2_bytes_header(str[p])) {
-        p += 2;
-        return get_utf8_2_bytes(str + p - 2);
+    } else if (is_utf8_3_bytes_header(*cur)) {
+        return get_utf8_3_bytes(cur, end);
 
-    } else if (is_utf8_3_bytes_header(str[p])) {
-        p += 3;
-        return get_utf8_3_bytes(str + p - 3);
-
-    } else throw String::EncodingError("not utf-8 code point", str, 4);
+    } else {
+        // discard this byte and return '?'
+        ++cur;
+        return '?';
+    }
 }
 
 bool is_utf16_surrogate_high(Char ch) { return (ch & 0b1111'1100'0000'0000) == 0b1101'1000'0000'0000; }
@@ -75,11 +78,10 @@ String::Content * String::from_utf8(const uint8_t * str, int len)
 {
     Char * buf = new Char[len];
 
-    int i = 0;
     int l = 0;
-    while (i < len)
-        buf[l++] = get_utf8_code_point(str, & i);
-    if (i != len) throw EncodingError("incomplete utf8 string");
+    const uint8_t *end = str + len;
+    while (str < end)
+        buf[l++] = get_utf8_code_point(str, end);
 
     Content * ret = prep_ctnt(l);
     for (int i = 0; i < l; ++i)
@@ -92,16 +94,18 @@ String::Content * String::from_mutf8(const uint8_t * str, int len)
 {
     Char * buf = new Char[len];
 
-    int i = 0;
+    const uint8_t *cur = str, *end = str + len;
     int l = 0;
-    while (i < len) {
-        Char ch = get_utf8_code_point(str, & i);
 
-        if (is_utf16_surrogate_high(ch)) {
-            Char low = get_utf8_code_point(str, & i);
+    while (cur < end) {
+        Char ch = get_utf8_code_point(cur, end);
+cont:
+        if (is_utf16_surrogate_high(ch) && cur < end) {
+            Char low = get_utf8_code_point(cur, end);
             if (! is_utf16_surrogate_low(low)) {
                 buf[l++] = ch;
                 ch = low;
+                goto cont;
             } else {
                 ch = get_utf16_surrogate_val(ch, low);
             }
@@ -109,8 +113,6 @@ String::Content * String::from_mutf8(const uint8_t * str, int len)
 
         buf[l++] = ch;
     }
-
-    if (i != len) throw EncodingError("incomplete mutf8 string");
 
     Content * ret = prep_ctnt(l);
     for (int i = 0; i < l; ++i)

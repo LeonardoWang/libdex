@@ -55,8 +55,8 @@ String Reader::str()
 
     int len = strnlen((const char *) data + off, utf16_len * 4);
     if (len >= utf16_len * 4) {
-        printf("%d %d %08x\n", utf16_len, len, off);
-        throw String::EncodingError("incorrect utf-16 length", data + off, len);
+        //printf("%d %d %08x\n", utf16_len, len, off);
+        //throw String::EncodingError("incorrect utf-16 length", data + off, len);
     }
 
     String ret(data + off, len, String::MUTF8);
